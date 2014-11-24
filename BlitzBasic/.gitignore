@@ -1,0 +1,8 @@
+# Source Backup Files
+*.bb_bak2
+*.bb_bak1
+
+# Binary Files
+*.exe
+*.o
+*.a

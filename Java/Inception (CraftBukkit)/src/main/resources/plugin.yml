@@ -1,0 +1,27 @@
+# Authors: Xaymar
+# Copyright: 2012-2013 (c) Inception Plugin Team.
+# License: CC BY-SA 3.0
+#      Inception by Inception Plugin Team is licensed under a
+#      Creative Commons Attribution-ShareAlike 3.0 Unported
+#      License.
+
+name: Inception
+version: "1.6.2-R0.1 [R3]"
+author: Xaymar
+website: http://plugins.realitybends.de/?p=Inception/
+main: de.RealityBends.Inception.Plugin
+prefix: "Inception"
+load: POSTWORLD
+softdepend: [ Multiverse-Core, MyWorlds ]
+commands:
+  inception:
+    description: Control Inception with this command
+    aliases: [ic, inc]
+    permission: inception.command
+permissions:
+  inception.overlap:
+    description: Allow the player to be recognized by overlapping.
+    default: true
+  inception.teleport:
+    description: Allow the player to be recognized by teleporting.
+    default: true  

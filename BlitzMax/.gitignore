@@ -1,0 +1,6 @@
+# Binary Files
+*.o
+*.a
+*.exe
+*/.bmx
+*/.indevIDE

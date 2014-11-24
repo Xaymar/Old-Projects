@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Stream to VLC - View Twitch and Justin in VLC!</title>
+		<style>
+			* {
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+				box-sizing: border-box;
+				-webkit-transition: all 100ms ease-in-out;
+				-moz-transition: all 100ms ease-in-out;
+				-ms-transition: all 100ms ease-in-out;
+				-o-transition: all 100ms ease-in-out;
+				transition: backgr 100ms ease-in-out;
+			}
+			
+			body {
+				width: 100%;
+				height: 100%;
+				
+				margin: 0px;
+				padding: 0px;
+				
+				background: rgb(215, 215, 215);
+				
+				font-size: 15px;
+				font-family: Tahoma, Arial;
+			}
+			
+			a, a:focus {
+				color: rgb(82,138,195);
+			}
+			
+			a:hover, a:active {
+				color: rgb(122,188,255);
+			}
+			
+			.container {
+				width: 100%;
+				min-width: 200px;
+				
+				margin: 0px;
+				//margin-left: auto;
+				//margin-right: auto;
+				padding: 32px 0px;
+			}
+			
+			.input, .output, .error {
+				width: 90%;
+				min-width: 460px;
+				max-width: 600px;
+				min-height: 64px;
+				
+				margin: 0px auto;
+				margin-bottom: 24px;
+				padding: 4px;
+				
+				border-radius: 16px;
+				border: 1px solid rgb(180, 180, 180);
+				
+				background: rgb(240, 240, 240);
+				-webkit-box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.66);
+				box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.66);
+			}
+			
+			.title {
+				height: 30px;
+				
+				margin: -5px;
+				margin-bottom: 2px;
+				padding: 1px;
+				
+				background: rgb(122,188,255);
+				background: -moz-linear-gradient(top,  rgb(122,188,255) 0%, rgb(96,171,248) 44%, rgb(32,118,204) 100%);
+				background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(122,188,255)), color-stop(44%,rgb(96,171,248)), color-stop(100%,rgb(32,118,204)));
+				background: -webkit-linear-gradient(top,  rgb(122,188,255) 0%,rgb(96,171,248) 44%,rgb(32,118,204) 100%);
+				background: -o-linear-gradient(top,  rgb(122,188,255) 0%,rgb(96,171,248) 44%,rgb(32,118,204) 100%);
+				background: -ms-linear-gradient(top,  rgb(122,188,255) 0%,rgb(96,171,248) 44%,rgb(32,118,204) 100%);
+				background: linear-gradient(to bottom,  rgb(122,188,255) 0%,rgb(96,171,248) 44%,rgb(32,118,204) 100%);
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7abcff', endColorstr='#2076cc',GradientType=0 );
+				-webkit-box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.33);
+				box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.33);
+				border: 1px solid rgb(32, 118, 204);
+				border-radius: 16px 16px 0px 0px;
+				
+				font-size: 18px;
+				font-weight: bold;
+				color: white;
+				text-align: center;
+			}
+			
+			.input .row {
+				width: 100%;
+				height: 20px;
+				clear: both;
+				
+				margin: 0px;
+				padding: 0px;
+				
+				position: relative;
+			}
+			
+			.input .row .cell {
+				height: 22px;
+				float: left;
+				
+				padding: 1px;
+			}
+			
+			.input .row .cell:first-child {
+				width: 150px;
+
+				padding: 2px;
+			}
+			
+			.input .row .cell:last-child {
+				position: absolute;
+				left: 150px;
+				right: 0px;
+			}
+			
+			.input .row .cell .row .cell:first-child {
+				width: 100px;
+
+				padding: 0px;
+			}
+			
+			.input .row .cell .row .cell:last-child {
+				padding: 0px;
+				
+				left: 100px;
+			}
+			
+			.input input, .input select {
+				width: 100%;
+				height: 20px;
+				
+				margin: 0px;
+				padding: 1px 4px;
+				
+				background: rgb(250, 250, 250);
+				border: 1px solid rgb(200, 200, 200);
+				border-radius: 6px;
+				-webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.16);
+				box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.16); 
+			}
+			
+			.cell:hover input, input:hover, input:active, input:focus, .cell:hover select, select:hover, select:active, select:focus {
+				background: rgb(255, 255, 255);
+				border-color: rgb(150, 200, 255);
+				-webkit-box-shadow: 0px 1px 2px 0px rgba(150, 200, 255, 0.33);
+				box-shadow: 0px 1px 2px 0px rgba(150, 200, 255, 0.33); 
+			}
+			
+			select#host {
+				padding: 0px;
+				
+				border-radius: 6px 0px 0px 6px;
+				border-right: none;
+			}
+			
+			input#channel {
+				border-radius: 0px 6px 6px 0px;
+				border-left: none;
+				
+				position: relative;
+				left: 0px;
+				right: 0px;
+			}
+			
+			input.submit {
+				width: 100%;
+				height: 24px;
+				
+				margin: 12px auto 0px auto;
+				padding: 0px;
+				
+				background: rgb(110,180,242);
+				background: -moz-linear-gradient(top,  rgb(110,180,242) 0%, rgb(84,164,238) 50%, rgb(54,144,240) 51%, rgb(30,104,222) 100%);
+				background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(110,180,242)), color-stop(50%,rgb(84,164,238)), color-stop(51%,rgb(54,144,240)), color-stop(100%,rgb(30,104,222)));
+				background: -webkit-linear-gradient(top,  rgb(110,180,242) 0%,rgb(84,164,238) 50%,rgb(54,144,240) 51%,rgb(30,104,222) 100%);
+				background: -o-linear-gradient(top,  rgb(110,180,242) 0%,rgb(84,164,238) 50%,rgb(54,144,240) 51%,rgb(30,104,222) 100%);
+				background: -ms-linear-gradient(top,  rgb(110,180,242) 0%,rgb(84,164,238) 50%,rgb(54,144,240) 51%,rgb(30,104,222) 100%);
+				background: linear-gradient(to bottom,  rgb(110,180,242) 0%,rgb(84,164,238) 50%,rgb(54,144,240) 51%,rgb(30,104,222) 100%);
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6eb4f2', endColorstr='#1e68de',GradientType=0 );
+				border: 1px solid rgb(32, 118, 204);
+				border-radius: 12px;
+				
+				cursor: pointer;
+				
+				color: white;
+				font-size: 16px;
+				font-weight: bold;
+				text-align: center;
+			}
+			
+			input.submit:hover {
+				background: rgb(152,202,246);
+				background: -moz-linear-gradient(top,  rgb(152,202,246) 0%, rgb(133,190,243) 50%, rgb(112,176,244) 51%, rgb(93,147,233) 100%);
+				background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(152,202,246)), color-stop(50%,rgb(133,190,243)), color-stop(51%,rgb(112,176,244)), color-stop(100%,rgb(93,147,233)));
+				background: -webkit-linear-gradient(top,  rgb(152,202,246) 0%,rgb(133,190,243) 50%,rgb(112,176,244) 51%,rgb(93,147,233) 100%);
+				background: -o-linear-gradient(top,  rgb(152,202,246) 0%,rgb(133,190,243) 50%,rgb(112,176,244) 51%,rgb(93,147,233) 100%);
+				background: -ms-linear-gradient(top,  rgb(152,202,246) 0%,rgb(133,190,243) 50%,rgb(112,176,244) 51%,rgb(93,147,233) 100%);
+				background: linear-gradient(to bottom,  rgb(152,202,246) 0%,rgb(133,190,243) 50%,rgb(112,176,244) 51%,rgb(93,147,233) 100%);
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#98caf6', endColorstr='#5d93e9',GradientType=0 );
+				border-color: rgb(110,180,242);
+			}
+			
+			.output .row {
+				width: 100%;
+				height: auto;
+				
+				position: relative;
+			}
+			
+			#command {
+				width: 100%;
+				min-width: 100%;
+				max-width: 100%;
+				height: 80px;
+				min-height: 30px;
+				
+				padding: 2px;
+				
+				background: rgb(250, 250, 250);
+				border: 1px solid rgb(200, 200, 200);
+				border-radius: 0px 0px 10px 10px;
+				-webkit-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.16), inset 0px 0px 4px 0px rgba(255, 255, 255, 1);
+				box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.16), inset 0px 0px 4px 0px rgba(255, 255, 255, 1); 
+			}
+			
+			#command:hover, #command:active, #command:focus {
+				background: rgb(255, 255, 255);
+				border-color: rgb(150, 200, 255);
+				-webkit-box-shadow: 0px 1px 2px 0px rgba(150, 200, 255, 0.33);
+				box-shadow: 0px 1px 2px 0px rgba(150, 200, 255, 0.33); 
+			}
+			
+			#quality {
+				position: absolute;
+				top: 1px;
+				right: 1px;
+				
+				opacity: 0.3;
+				
+				border: 1px solid rgb(200, 200, 200);
+				border-radius: 0px 0px 0px 10px;
+			}
+			
+			#quality:hover {
+				opacity: 1;
+			}
+			
+			.error .title {
+				background: rgb(255,188,122);
+				background: -moz-linear-gradient(top,  rgb(255, 188, 122) 0%, rgb(248, 171, 96) 44%, rgb(204, 118, 32) 100%);
+				background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(255, 188, 122)), color-stop(44%,rgb(248, 171, 96)), color-stop(100%,rgb(204, 118, 32)));
+				background: -webkit-linear-gradient(top,  rgb(255, 188, 122) 0%,rgb(248, 171, 96) 44%,rgb(204, 118, 32) 100%);
+				background: -o-linear-gradient(top,  rgb(255, 188, 122) 0%,rgb(248, 171, 96) 44%,rgb(204, 118, 32) 100%);
+				background: -ms-linear-gradient(top,  rgb(255, 188, 122) 0%,rgb(248, 171, 96) 44%,rgb(204, 118, 32) 100%);
+				background: linear-gradient(to bottom,  rgb(255, 188, 122) 0%,rgb(248, 171, 96) 44%,rgb(204, 118, 32) 100%);
+				border: 1px solid rgb(204, 118, 38);
+			}
+			
+			.error #errortext {
+				padding: 4px;
+				width: 100%;
+				margin-left: auto;
+				margin-right: auto;
+				text-align: center;
+				font-weight: bold;
+			}
+		</style>
+		<script type="text/javascript">
+			var qualities = ["", "", "", "", ""];
+			var hosts = [];
+			
+			// Twitch.TV/Justin.TV
+			hosts[0] = "##WAITINGFORUPDATE##";
+			
+			// Update 
+			var twitchXHR = createXMLHTTPRequest();
+			twitchXHR.open("GET", "getTwitchData.php?action=url", false)
+			twitchXHR.send();
+			if (twitchXHR.status == 200) {
+				hosts[0] = twitchXHR.response;
+			}
+			
+			function updateCommands() {
+				var vlcplayer	= document.getElementById("vlcplayer").value;
+				var rtmpdump	= document.getElementById("rtmpdump").value;
+				var host	= document.getElementById("host").value;
+				var channel	= document.getElementById("channel").value;
+				var quality = document.getElementById("quality");
+				var streams = [];
+				
+				// Clear the quality list.
+				quality.innerHTML = "";
+				
+				// Retrieve channel data and populate quality list.
+				switch(host) {
+					case "0":
+						qualityXHR = createXMLHTTPRequest();
+						qualityXHR.open("GET", "getTwitchData.php?action=data&channel=" + escape(channel), false);
+						qualityXHR.send();
+						if (qualityXHR.status == 429) {
+							document.getElementById("output").style.display = "none";
+							document.getElementById("error").style.display = "block";
+							document.getElementById("errortext").innerHTML = "Please wait " + qualityXHR.response + " more seconds before requesting data!";
+							return;
+						} else if (qualityXHR.status == 200) {
+							if (qualityXHR.responseText == "{}" || qualityXHR.responseText == "") {
+								document.getElementById("output").style.display = "none";
+								document.getElementById("error").style.display = "block";
+								document.getElementById("errortext").innerHTML = "Channel is invalid or offline!";
+								return;
+							} else {
+								var jsObj = JSON.parse(qualityXHR.responseText);
+								var id = 0;
+								for (var key in jsObj) {
+									streams[id] = jsObj[key]["CONNECT"] + "/" + jsObj[key]["PLAY"];
+									quality.innerHTML += "<option value=\""+id+"\">"+jsObj[key]["DISPLAY"]+"</option>";
+									id++;
+								}
+							}
+						}
+				}
+				
+				for(var q = 0; q < streams.length; q++) {
+					qualities[q] = "\"" + rtmpdump + "\" -r \"" + streams[q] + "\" --swfVfy \"" + hosts[host] + "\" -v -o - | \"" + vlcplayer + "\" - --play-and-exit";
+					qualities[q] = qualities[q].replace(/##CHANNEL##/g, escape(channel));
+				}
+				
+				document.getElementById("output").style.display = "block";
+				document.getElementById("error").style.display = "none";
+				changeQuality(document.getElementById("quality").value);
+			}
+			
+			function changeQuality(level) {
+				document.getElementById("command").value = qualities[level];
+			}
+			
+			function createXMLHTTPRequest() {
+				var xhr;
+				try {
+					xhr = new XMLHttpRequest();
+				} catch(IEOnce) {
+					try {
+						xhr = new ActiveXObject("Microsoft.XMLHTTP");
+					} catch(IETwice) {
+						try {
+							xhr = new ActiveXObject("Msxml2.XMLHTTP");
+						} catch(IEThrice) {
+							alert("Problem: Unable to create XMLHTTPRequest.\nSolution: Upgrade your browser.");
+						}
+					}
+				}
+				return xhr;
+			}
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="input">
+				<div class="title">Stream to VLC - View Twitch and Justin in VLC!</div>
+				<form onsubmit="return false;">
+				<div class="row">
+					<div class="cell">Host &amp; Channel:</div>
+					<div class="cell">
+						<div class="row">
+							<div class="cell">
+								<select id="host" name="host">
+									<option value="0">Twitch/Justin</option>
+								</select>
+							</div>
+							<div class="cell"><input id="channel" name="channel" type="text"></div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="cell">Path to <a href="http://www.videolan.org/vlc/" target="_new">VLC Player</a>:</div>
+					<div class="cell"><input id="vlcplayer" name="vlcplayer" type="text"></div>
+				</div>
+				<div class="row">
+					<div class="cell">Path to <a href="http://rtmpdump.mplayerhq.hu/" target="_new">RTMPDump</a>:</div>
+					<div class="cell"><input id="rtmpdump" name="rtmpdump" type="text"></div>
+				</div>
+				<input type="submit" class="submit" onclick="updateCommands()" value="Submit">
+				</form>
+			</div>
+			<div id="output" class="output" style="display: none;">
+				<div class="title">Command</div>
+				<div class="row">
+					<textarea id="command"></textarea>
+					<select id="quality" name="quality" onchange="changeQuality(this.value)">
+					</select>
+				</div>
+			</div>
+			<div id="error" class="error" style="display: none;">
+				<div class="title">Error</div>
+				<div id="errortext"></div>
+			</div>
+		</div>
+	</body>
+</html>

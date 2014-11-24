@@ -1,0 +1,259 @@
+#version 420
+
+/* Animated Water using Flow Maps
+ *	  Shader By: Xaymar
+ * 
+ * Usage:
+ *	s2FlowMap			- FlowMap for the Water, see below on the color components
+ *	s2DiffuseMap		- DiffuseMap (Used for <Foam>)
+ *	s2NormalMap			- NormalMap (Used for refracting the <Reflection> and <Objects in Water>)
+ *  s2Reflect			- Reflection Texture (RGB = Color)
+ *  s2Refract			- Refraction Texture (RGB = Color, A = Depth)
+ *  v2Density			- Thickness Settings: Density, MinimumDepth
+ *	v3Color				- Tinting of Refraction and color of Fog
+ *	v3Animation			- Animation Settings: Length, SpeedMul, OffsetMul
+ *	v2ReflectDimensions	- Size of 's2Reflect'
+ *	v2RefractDimensions	- Size of 's2Refract'
+ * 
+ * Components of the Flow map:
+ *	Red		- X-Direction (Normalized with Y-Direction to create movement Vector)
+ *	Green	- Y-Direction (Normalized with X-Direction to create movement Vector)
+ *	Blue	- Speed (0.125 = Half, 0.25 = Normal, 0.5 = Double, 1.0 = Quadruple)
+ *
+ * NormalMap Color Components:
+ *	RGB		- Normal
+ *  Alpha	- Height
+ */
+
+/* Which Fading technique to use for each Texture.
+ * Defaults to RGB fading if none is defined.
+ */
+// YUV based fading
+//#define FADE_DIFFUSEMAP_YUV
+//#define FADE_NORMALMAP_YUV
+
+// YIQ based fading
+//#define FADE_DIFFUSEMAP_YIQ
+//#define FADE_NORMALMAP_YIQ
+
+// HSL based fading
+//#define FADE_DIFFUSEMAP_HSL
+//#define FADE_NORMALMAP_HSL
+
+// HSV based fading
+//#define FADE_DIFFUSEMAP_HSV
+//#define FADE_NORMALMAP_HSV
+
+/* Enable Debug Modes */
+//#define DEBUG_FLOW
+//#define DEBUG_TESTDIFFUSE
+//#define DEBUG_DIFFUSE
+//#define DEBUG_NORMAL
+//#define DEBUG_REFRACT
+//#define DEBUG_REFLECT
+
+/* Constants */
+const float LOG2 = 1.442695;
+
+/* Water Variables */
+uniform sampler2D s2DiffuseMap;
+uniform sampler2D s2NormalMap;
+uniform sampler2D s2FlowMap;
+uniform vec2 v2Density;
+uniform vec3 v3Color;
+uniform vec3 v3Animation;
+
+/* Reflection and Refraction */
+uniform sampler2D s2Reflect;
+uniform vec2 v2ReflectSize;
+uniform sampler2D s2Refract;
+uniform vec2 v2RefractSize;
+
+/* Other Things */
+uniform float fTime;
+uniform float fNormalStrength;
+
+/* Variables from Vertex Program */
+in vec2 v2TextureCoord0;
+in vec4 v4VertexPosition;
+
+/* Function pre-definitions */
+vec3 RGB2YUV(in vec3 RGB);
+vec3 YUV2RGB(in vec3 YUV);
+vec3 RGB2YIQ(in vec3 RGB);
+vec3 YIQ2RGB(in vec3 YIQ);
+vec3 RGB2HSL(in vec3 RGB);
+vec3 HSL2RGB(in vec3 HSL);
+vec3 RGB2HSV(in vec3 RGB);
+vec3 HSV2RGB(in vec3 HSV);
+
+// Main Loop
+void main(void) {
+	// Read and convert the flowmap color into useable values.
+	vec4 v4FlowData		= texture(s2FlowMap, v2TextureCoord0);
+	vec2 v2Offset		= normalize(vec2(-1.0 + v4FlowData.r * 2.0, -1.0 + v4FlowData.g * 2.0));
+	float fSpeed		= max(v3Animation.y * (v4FlowData.b * 4.0), 0.00001);
+	float fTimeOffset	= dot(v2Offset, v2TextureCoord0) * v3Animation.z;
+	
+	// Since the water can flow at different speeds, the same repeat time is not always appropriate.
+	float fAnimTime = max(v3Animation.x / fSpeed, 0.00001);
+	float fRealTime = mod(fTime + fTimeOffset, fAnimTime);
+	float fProgress	= fRealTime / fAnimTime;
+	// Calculate the fade value from how far the time has progressed.
+	float fFade		= sin(radians(fProgress * 90));
+	
+	// Calculate the new Texture Coords using direction, speed and time.
+	vec2 v2Coord1 = v2TextureCoord0 + v2Offset * fSpeed * fRealTime;
+	vec2 v2Coord2 = v2Coord1 - v2Offset * fSpeed * fAnimTime;
+	
+	// Normal: Gather Texels and combine them.
+	vec4 v4Normal;
+	vec4 v4Normal1 = texture(s2NormalMap, v2Coord1);
+	vec4 v4Normal2 = texture(s2NormalMap, v2Coord2);
+	
+	// Normal: Fade between Normal1 and Normal2.
+	#ifdef FADE_NORMALMAP_YUV
+		v4Normal.rgb = YUV2RGB(mix(RGB2YUV(v4Normal1.rgb), RGB2YUV(v4Normal2.rgb), fFade));
+	#else
+		#ifdef FADE_NORMALMAP_YIQ
+			v4Normal.rgb = YIQ2RGB(mix(RGB2YIQ(v4Normal1.rgb), RGB2YIQ(v4Normal2.rgb), fFade));
+		#else
+			#ifdef FADE_NORMALMAP_HSL
+				v4Normal.rgb = HSL2RGB(mix(RGB2HSL(v4Normal1.rgb), RGB2HSL(v4Normal2.rgb), fFade));
+			#else
+				#ifdef FADE_NORMALMAP_HSV
+					v4Normal.rgb = HSV2RGB(mix(RGB2HSV(v4Normal1.rgb), RGB2HSV(v4Normal2.rgb), fFade));
+				#else //Default to RGB mixing
+					v4Normal.rgb = mix(v4Normal1.rgb, v4Normal2.rgb, fFade);
+				#endif
+			#endif
+		#endif
+	#endif
+	v4Normal.a = mix(v4Normal1.a, v4Normal2.a, fFade);
+	
+	// Normal: Adjust XYZ Vector.
+	v4Normal.xyz = (vec3(-1.0, -1.0, -1.0) + (2.0 * v4Normal.xyz)) * fNormalStrength;
+	v4Normal.xy *= gl_FragCoord.w;
+	
+	// Refraction & Reflection: Use Screen Coordinates and Normal map to distort.
+	vec3 v3RefractColor = texture(s2Refract, (gl_FragCoord.xy / v2RefractSize) + v4Normal.xy).rgb;
+	vec3 v3ReflectColor = texture(s2Reflect, (gl_FragCoord.xy / v2ReflectSize) + v4Normal.xy).rgb;
+	
+	// Refraction & Reflection: Visibility is based on Distance to camera and ground.
+	//@TODO: Visibility using distance to object behind it.
+	float fDepth = max(length(v4VertexPosition.xyz - gl_ModelViewMatrixInverse[3].xyz) - v2Density.y, 0.0);
+	float fTransparency = clamp(exp2(-v2Density.x * v2Density.x * fDepth * fDepth * LOG2), 0.0, 1.0);
+	vec3 v3Output = mix(v3ReflectColor, v3RefractColor * v3Color.rgb, fTransparency);
+	
+	// Diffuse/Foam: Add foam to the top of the waves.
+	vec4 v4Diffuse;
+	vec4 v4Diffuse1 = texture(s2DiffuseMap, v2Coord1);
+	vec4 v4Diffuse2 = texture(s2DiffuseMap, v2Coord2);
+	
+	// Diffuse/Foam: Fade between Diffuse1 and Diffuse2.
+	#ifdef FADE_DIFFUSEMAP_YUV
+		v4Diffuse.rgb = YUV2RGB(mix(RGB2YUV(v4Diffuse1.rgb), RGB2YUV(v4Diffuse2.rgb), fFade));
+	#else
+		#ifdef FADE_DIFFUSEMAP_YIQ
+			v4Diffuse.rgb = YIQ2RGB(mix(RGB2YIQ(v4Diffuse1.rgb), RGB2YIQ(v4Diffuse2.rgb), fFade));
+		#else
+			#ifdef FADE_DIFFUSEMAP_HSL
+				v4Diffuse.rgb = HSL2RGB(mix(RGB2HSL(v4Diffuse1.rgb), RGB2HSL(v4Diffuse2.rgb), fFade));
+			#else
+				#ifdef FADE_DIFFUSEMAP_HSV
+					v4Diffuse.rgb = HSV2RGB(mix(RGB2HSV(v4Diffuse1.rgb), RGB2HSV(v4Diffuse2.rgb), fFade));
+				#else //Default to RGB mixing
+					v4Diffuse.rgb = mix(v4Diffuse1.rgb, v4Diffuse2.rgb, fFade);
+				#endif
+			#endif
+		#endif
+	#endif
+	v4Diffuse.a = mix(v4Diffuse1.a, v4Diffuse2.a, fFade);
+	
+	// Output the result.
+	#ifdef DEBUG_FLOW
+		gl_FragColor.rgb = v4FlowData.rgb;
+	#else
+		#ifdef DEBUG_DIFFUSE
+			gl_FragColor.rgb = v4Diffuse.rgb;
+		#else
+			#ifdef DEBUG_NORMAL
+				gl_FragColor.rgb = v3Normal;
+			#else
+				#ifdef DEBUG_REFRACT
+					gl_FragColor.rgb = v3Refract;
+				#else
+					#ifdef DEBUG_REFLECT
+						gl_FragColor.rgb = v3Reflect;
+					#else
+						gl_FragColor.rgb = v3Output;
+					#endif
+				#endif
+			#endif
+		#endif
+	#endif
+}
+
+/* --- --- RGB Conversion Functions --- ---*/
+// RGB <-> YUV
+const vec3 yuv_Y = vec3(0.299000,  0.587000,  0.114000);
+const vec3 yuv_U = vec3(0.595716, -0.274453, -0.321263);
+const vec3 yuv_V = vec3(0.211456, -0.522591,  0.311135);
+const vec3 yuv_R = vec3(1.0,  0.9562,  0.6210);
+const vec3 yuv_G = vec3(1.0, -0.2721, -0.6474);
+const vec3 yuv_B = vec3(1.0, -1.1070,  1.7046);
+
+vec3 RGB2YUV(in vec3 RGB) {
+	return RGB;
+}
+
+vec3 YUV2RGB(in vec3 YUV) {
+	return YUV;
+}
+
+// RGB <-> YIQ
+const vec3 yiq_Y = vec3(0.299000,  0.587000,  0.114000);
+const vec3 yiq_I = vec3(0.595716, -0.274453, -0.321263);
+const vec3 yiq_Q = vec3(0.211456, -0.522591,  0.311135);
+const vec3 yiq_R = vec3(1.0,  0.9562,  0.6210);
+const vec3 yiq_G = vec3(1.0, -0.2721, -0.6474);
+const vec3 yiq_B = vec3(1.0, -1.1070,  1.7046);
+
+#define dRGB2YIQ(RGB) vec3(dot(RGB, yiq_Y), dot(RGB, yiq_I), dot(RGB, yiq_Q))
+#define dYIQ2RGB(YIQ) vec3(dot(YIQ, yiq_R), dot(YIQ, yiq_G), dot(YIQ, yiq_B))
+vec3 RGB2YIQ(in vec3 RGB) {
+	return vec3(dot(RGB, yiq_Y), dot(RGB, yiq_I), dot(RGB, yiq_Q));
+}
+
+vec3 YIQ2RGB(in vec3 YIQ) {
+	return vec3(dot(YIQ, yiq_R), dot(YIQ, yiq_G), dot(YIQ, yiq_B));
+}
+
+// RGB <-> HSL
+vec3 RGB2HSL(in vec3 RGB) {
+	return RGB;
+}
+
+vec3 HSL2RGB(in vec3 HSL) {
+	return HSL;
+}
+
+// RGB <-> HSV
+const vec4 hsv_From = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+const vec4 hsv_To	= vec4(1.0,  2.0 / 3.0, 1.0 / 3.0,  3.0);
+
+vec3 RGB2HSV(in vec3 RGB) {
+	 vec4 p = mix(vec4(RGB.bg, hsv_From.wz), vec4(RGB.gb, hsv_From.xy), step(RGB.b, RGB.g));
+	 vec4 q = mix(vec4(p.xyw, RGB.r), vec4(RGB.r, p.yzx), step(p.x, RGB.r));
+
+	 float d = q.x - min(q.w, q.y);
+	 float e = 1.0e-10;
+	 return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 HSV2RGB(in vec3 HSV) {
+	 vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+	 vec3 p = abs(fract(HSV.xxx + hsv_To.xyz) * 6.0 - hsv_To.www);
+	 return HSV.z * mix(hsv_To.xxx, clamp(p - K.xxx, 0.0, 1.0), HSV.y);
+}
+/* --- --- End Of: RGB Conversion Functions --- --- */

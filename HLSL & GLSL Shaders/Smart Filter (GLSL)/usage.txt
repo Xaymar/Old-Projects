@@ -1,0 +1,20 @@
+Shader:
+	Vertex Program: SmartFilter.vp.glsl
+		Inputs: None
+		Outputs: None
+	Fragment Program: SmartFilter.fp.glsl
+		Inputs:
+			sampler2D	diffuseMap	Base Color Image to put onto the Mesh/Model
+			sampler2D	stateMap	Preprocessed Image to calculate tween-texels from
+			boolean		enabled		Enable or Disable SmartFilter(Debugging)
+			float		mixStep		Set the mixture of bilinear and smart filtering. A value of 2/3 looks good.
+		Outputs: none
+	Apply shaders to: Mesh/Model
+	Sideeffects:
+		Slight Texture artifacts
+		Requires twice as much GPU ram right now.
+
+sfltproc.exe
+	Use this to get the stateMap out of a diffuseMap. Use it like this:
+	sfltproc.exe -i "INPUTIMAGE" -o "OUTPUTIMAGE" -b Threshold(0-255)
+	It also has a help parameter, -h

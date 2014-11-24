@@ -1,0 +1,19 @@
+# File: ExtraGenerators/src/main/resources/plugin.yml
+# Provides: Plugin Descriptor File
+# Authors: Xaymar
+# Copyright: 2013 (c) ExtraGenerators Plugin Team.
+# License: CC-BY-SA
+#      ExtraGenerators by ExtraGenerators Plugin Team is licensed under a
+#      Creative Commons Attribution-ShareAlike 3.0 Unported
+#      License. 
+
+name: ExtraGenerators
+version: "1.6.2-R0.1 [R1]"
+author: Xaymar
+website: http://realitybends.de/ExtraGenerators
+main: de.RealityBends.ExtraGenerators.Plugin
+prefix: "ExtraGenerators"
+load: STARTUP
+softdepend: 
+commands:
+permissions:
