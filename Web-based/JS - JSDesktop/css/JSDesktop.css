@@ -1,0 +1,156 @@
+html, body {
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	background: white;
+}
+
+/* JSDesktop Style: Default */
+.JSDesktop {
+	width: 100%;
+	height: 100%;
+	background: rgb(58, 110, 165);
+	position: relative;
+	overflow: auto;
+}
+
+/* Substyle: Make everything follow actual sizes. Stupid Box-Model. */
+.JSDesktop * {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+/* JSWindow Style: Normal
+ ** Possible Flags: **
+ * + Active - State set when the window is topmost object. (Usually means in use)
+ * + Titlebar - Show Titlebar.
+ * + Icon - Show Window Icon (Requires Titlebar).
+ * + ThinBorder - Show 1px thick border.
+ * + Border - Show 2px thick border.
+ * + ThickBorder - Show 3px thick border.
+ */
+.JSDesktop .JSWindow {
+	background: rgb(212, 208, 200);
+	border-color: rgb(212, 208, 200) rgb(64, 64, 64) rgb(64, 64, 64) rgb(212, 208, 200);
+	border-style: solid;
+	border-width: 0px;
+	color: black;
+	float: left;
+	font-family: "Segoe UI";
+	font-size: 8pt;
+	margin: 0px;
+	padding: 0px;
+	position: absolute;
+	z-index: 0;
+	-webkit-box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.19069);
+	box-shadow: 4px 4px 8px 0px rgba(0, 0, 0, 0.19069);
+}
+
+.JSDesktop .JSWindow.JSFlag_Active {
+	-webkit-box-shadow: 8px 8px 16px 0px rgba(0, 0, 0, 0.38138);
+	box-shadow: 8px 8px 16px 0px rgba(0, 0, 0, 0.38138);
+}
+
+/* JSWindow Style: Border Enabled*/
+.JSDesktop .JSWindow.JSFlag_Border,
+.JSDesktop .JSWindow.JSFlag_ThickBorder {
+	border-width: 1px;
+}
+
+/* JSBorder Style: Disabled */
+.JSDesktop .JSWindow .JSBorder {
+	border-color: rgb(255, 255, 255) rgb(128, 128, 128) rgb(128, 128, 128) rgb(255, 255, 255);
+	border-style: solid;
+	border-width: 0px;
+	height: 100%;
+	width: 100%;
+}
+
+/* JSBorder Style: Enabled & Thin */
+.JSDesktop .JSWindow.JSFlag_ThinBorder .JSBorder {
+	border-width: 1px;
+}
+
+/* JSBorder Style: Enabled */
+.JSDesktop .JSWindow.JSFlag_Border .JSBorder {
+	border-width: 1px;
+	padding: 2px;
+}
+
+/* JSBorder Style: Enabled & Thick */
+.JSDesktop .JSWindow.JSFlag_ThickBorder .JSBorder {
+	border-width: 2px;
+	padding: 2px;
+}
+
+/* JSTitlebar Style: Disabled */
+.JSDesktop .JSWindow .JSTitlebar {
+	display: none;
+	height: 0px;
+	width: auto;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+/* JSTitlebar Style: Enabled */
+.JSDesktop .JSWindow.JSFlag_Titlebar .JSTitlebar {
+	background: rgb(128,128,128);
+	background: -moz-linear-gradient(left,  rgb(128,128,128) 0%, rgb(192,192,192) 100%);
+	background: -ms-linear-gradient(left,  rgb(128,128,128) 0%,rgb(192,192,192) 100%);
+	background: -o-linear-gradient(left,  rgb(128,128,128) 0%,rgb(192,192,192) 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(128,128,128)), color-stop(100%,rgb(192,192,192)));
+	background: -webkit-linear-gradient(left,  rgb(128,128,128) 0%,rgb(192,192,192) 100%);
+	background: linear-gradient(to right,  rgb(128,128,128) 0%,rgb(192,192,192) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#808080', endColorstr='#c0c0c0',GradientType=1 );
+	display: block;
+	height: 18px;
+	padding: 1px 2px;
+}
+
+/* JSTitlebar Style: Enabled & Active */
+.JSDesktop .JSWindow.JSFlag_Titlebar.JSFlag_Active .JSTitlebar {
+	background: rgb(10,36,106);
+	background: -moz-linear-gradient(left,  rgb(10,36,106) 0%, rgb(166,202,240) 100%);
+	background: -ms-linear-gradient(left,  rgb(10,36,106) 0%,rgb(166,202,240) 100%);
+	background: -o-linear-gradient(left,  rgb(10,36,106) 0%,rgb(166,202,240) 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgb(10,36,106)), color-stop(100%,rgb(166,202,240)));
+	background: -webkit-linear-gradient(left,  rgb(10,36,106) 0%,rgb(166,202,240) 100%);
+	background: linear-gradient(to right,  rgb(10,36,106) 0%,rgb(166,202,240) 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0a246a', endColorstr='#a6caf0',GradientType=1 );
+}
+
+/* JSIcon: Disabled */
+.JSDesktop .JSWindow .JSTitlebar .JSIcon {
+	display: none;
+	float: left;
+	width: 18px;
+	height: 18px;
+	background-repeat: no-repeat;
+	background-image: url('./../img/icon_application.png');
+	background-position: center center;
+}
+
+/* JSIcon: Enabled (via JSFlag_Icon) */
+.JSDesktop .JSWindow.JSFlag_Titlebar.JSFlag_Icon .JSTitlebar .JSIcon {
+	display: inline;
+}
+
+/* JSTitle: Inactive Window */
+.JSDesktop .JSWindow .JSTitlebar .JSTitle {
+	display: inline;
+	height: 18px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	color: rgb(212, 208, 200);
+	font-weight: bold;
+}
+
+/* JSTitle: Active Window */
+.JSDesktop .JSWindow.JSFlag_Active .JSTitlebar .JSTitle {
+	color: rgb(255, 255, 255);
+}

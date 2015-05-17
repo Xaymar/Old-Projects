@@ -26,7 +26,6 @@ These projects are no longer supported and will not be continued, so use at your
 ### Userlibrary ###
 
 * InputEx
-* BlitzUtility
 
 ## BlitzMax ##
 
@@ -49,6 +48,7 @@ These projects are no longer supported and will not be continued, so use at your
 
 ## Web-based (HTML, JavaScript, PHP) ##
 
-* Stream2VLC
+* JS-Desktop - An attempt at creating a windowing system in Javascript. CC-BY-NC-SA
+* Stream2VLC - Pre-update twitch tool to get a direct stream link for VLC.
 * relink.php - Simple but safe redirection. CC-BY-NC-SA
 * myGravatar.php - Used to bypass dynamic avatar limitations on forums to use Gravatar. CC-BY-NC-SA

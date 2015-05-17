@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Desktop</title>
+		<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+		<script src="js/JSDesktop.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/JSDesktop.css">
+		<meta charset="utf-8" />
+	</head>
+	<body>
+		<div name="main" id="JSDesktop">
+<!--			<div class="JSWindow JSFlag_Titlebar" style="width: 200px; height: 100px; top: 10px; left: 10px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Titlebar</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThinBorder JSFlag_Titlebar" style="width: 200px; height: 100px; top: 10px; left: 220px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThinBorder+Titlebar</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_Border JSFlag_Titlebar" style="width: 200px; height: 100px; top: 10px; left: 430px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Border+Titlebar</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThickBorder JSFlag_Titlebar" style="width: 200px; height: 100px; top: 10px; left: 640px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThickBorder+Titlebar</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			
+			<div class="JSWindow JSFlag_Titlebar JSFlag_Active" style="width: 200px; height: 100px; top: 120px; left: 10px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Titlebar+Active</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThinBorder JSFlag_Titlebar JSFlag_Active" style="width: 200px; height: 100px; top: 120px; left: 220px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThinBorder+Titlebar+Active</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_Border JSFlag_Titlebar JSFlag_Active" style="width: 200px; height: 100px; top: 120px; left: 430px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Border+Titlebar+Active</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThickBorder JSFlag_Titlebar JSFlag_Active" style="width: 200px; height: 100px; top: 120px; left: 640px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThickBorder+Titlebar+Active</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			
+			<div class="JSWindow JSFlag_Titlebar JSFlag_Icon" style="width: 200px; height: 100px; top: 230px; left: 10px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Titlebar+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThinBorder JSFlag_Titlebar JSFlag_Icon" style="width: 200px; height: 100px; top: 230px; left: 220px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThinBorder+Titlebar+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_Border JSFlag_Titlebar JSFlag_Icon" style="width: 200px; height: 100px; top: 230px; left: 430px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Border+Titlebar+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThickBorder JSFlag_Titlebar JSFlag_Icon" style="width: 200px; height: 100px; top: 230px; left: 640px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThickBorder+Titlebar+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			
+			<div class="JSWindow JSFlag_Titlebar JSFlag_Icon JSFlag_Active" style="width: 200px; height: 100px; top: 340px; left: 10px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Titlebar+Active+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThinBorder JSFlag_Titlebar JSFlag_Icon JSFlag_Active" style="width: 200px; height: 100px; top: 340px; left: 220px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThinBorder+Titlebar+Active+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_Border JSFlag_Titlebar JSFlag_Icon JSFlag_Active" style="width: 200px; height: 100px; top: 340px; left: 430px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+Border+Titlebar+Active+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>
+			<div class="JSWindow JSFlag_ThickBorder JSFlag_Titlebar JSFlag_Icon JSFlag_Active" style="width: 200px; height: 100px; top: 340px; left: 640px;">
+				<div class="JSBorder">
+					<div class="JSTitlebar">
+						<div class="JSIcon"></div>
+						<div class="JSTitle">Window+ThickBorder+Titlebar+Active+Icon</div>
+					</div>
+					Inner
+				</div>
+			</div>-->
+		</div>
+	</body>
+</html>
